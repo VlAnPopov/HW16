@@ -1,0 +1,32 @@
+---
+- name: NGINX | Install and configure NGINX
+  hosts: web
+  become: true
+  tasks:
+    - name: Update
+      ansible.builtin.apt:
+        update_cache: yes
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: latest
+      notify:
+        - Restart nginx
+    - name: Logs setup
+      ansible.builtin.copy:
+        remote_src: true
+        src: /vagrant/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        force: true
+      notify:
+        - Restart nginx
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+    - name: Reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded

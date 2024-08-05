@@ -1,0 +1,20 @@
+---
+- name: Configure rsyslog
+  hosts: log
+  become: true
+  vars:
+  tasks:
+    - name: Logs setup
+      ansible.builtin.copy:
+        remote_src: true
+        src: /vagrant/rsyslog.conf
+        dest: /etc/rsyslog.conf
+        force: true
+      notify:
+        - Restart rsyslog
+  handlers:
+    - name: Restart rsyslog
+      ansible.builtin.systemd:
+        name: rsyslog
+        state: restarted
+        enabled: yes
